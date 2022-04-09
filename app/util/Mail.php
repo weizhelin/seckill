@@ -12,8 +12,8 @@ class Mail
 
     protected static function getMailer(): PHPMailer
     {
-        $config = ROOT_PATH . DIRECTORY_SEPARATOR . 'config' .DIRECTORY_SEPARATOR .'mail.php';
-        $config = include $config;
+        $config = config('mail');
+
         p($config);
         $mail = new PHPMailer(true);
         $mail->SMTPDebug = 0;                        // 调试模式输出

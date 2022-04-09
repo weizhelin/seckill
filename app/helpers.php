@@ -193,82 +193,30 @@ if (!function_exists('get_page')){
     }
 }
 
-
-/**
- * 功能：生成页码列表
- * @param string $preUrl url前缀
- * @param int $total 总条数
- * @param int $perPage 每页显示条数
- * @param int $curr 当前页
- * @param int $pageNum 显示页码数
- * @return string
- */
-if(!function_exists('create_page_list')){
-    function create_page_list(string $preUrl, int $total, int $perPage, int $curr, int $pageNum): string
-    {
-        $max = ceil($total/$perPage);                   //最大页码
-        $left = max(1,$curr-floor($pageNum/2));
-        $right = min($max,$left+$pageNum);
-        $left = max($right-$pageNum,1);
-        $pages = array();
-        for($i=$left;$i<=$right;$i++){
-            $pages[$i] = $i;
-        }
-        $pageList = '';
-        if ($max>1) {
-            if ($curr>1) {
-                $pageList .= '<a href="'.$preUrl.'" style="display:inline-block;margin-right:8px;margin-right:8px;">首页</a> ';
-                $pageList .= '<a href="'.$preUrl.'&pageno='.($curr-1).'" style="display:inline-block;margin-left:8px;margin-right:8px;">上一页</a>';
-            }else{
-                $pageList .= '<span class="current" style="display:inline-block;margin-left:8px;margin-right:8px;">首页</span>';
-                $pageList .= '<span class="current" style="display:inline-block;margin-left:8px;margin-right:8px;">上一页</span>';
-            }
-            $pageList .= '<span class="hiddenonoff">';
-            foreach ($pages as $key => $page) {
-                if ($curr==$key){
-                    $pageList .= '</span>';
-                    $pageList .= '<span class="current" style="display:inline-block;margin-left:8px;margin-right:8px;">'.$key.'</span>';
-                    $pageList .= '<span class="hiddenonoff">';
-                }else{
-                    $pageList .='<a href="'.$preUrl.'&pageno='.$page.'" style="display:inline-block;margin-left:8px;margin-right:8px;">'.$key.'</a>';
-                }
-            }
-            $pageList .= '</span>';
-
-            if ($curr!=$max) {
-                $pageList .= '<a href="'.$preUrl.'&pageno='.($curr+1).'" style="display:inline-block;margin-left:8px;margin-right:8px;">下一页</a>';
-                $pageList .='<a href="'.$preUrl.'&pageno='.$max.'" style="display:inline-block;margin-left:8px;margin-right:8px;">尾页</a> ';
-            }else{
-                $pageList .='<span class="current" style="display:inline-block;margin-left:8px;margin-right:8px;">下一页</span>';
-                $pageList .= '<span class="current" style="display:inline-block;margin-left:8px;margin-right:8px;">尾页</span>';
-            }
-        }
-        return $pageList;
-    }
-}
-
 /**
  * 功能：对数组进行递归转码
  * @param mixed $data 目标数组
  * @param string $output 目标编码
  * @return array|false|string|string[]|null
  */
-function array_iconv($data, $output = 'utf-8')
-{
-    $encode_arr = array('UTF-8', 'ASCII', 'GBK', 'GB2312', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP');
-    $encoded = mb_detect_encoding($data, $encode_arr);
-    if (!is_array($data)) {
-        return mb_convert_encoding($data, $output, $encoded);
-    } else {
-        foreach ($data as $key => $val) {
-            $key = array_iconv($key, $output);
-            if (is_array($val)) {
-                $data[$key] = array_iconv($val, $output);
-            } else {
-                $data[$key] = mb_convert_encoding($data, $output, $encoded);
+if(!function_exists('array_iconv')){
+    function array_iconv($data, $output = 'utf-8')
+    {
+        $encode_arr = array('UTF-8', 'ASCII', 'GBK', 'GB2312', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP');
+        $encoded = mb_detect_encoding($data, $encode_arr);
+        if (!is_array($data)) {
+            return mb_convert_encoding($data, $output, $encoded);
+        } else {
+            foreach ($data as $key => $val) {
+                $key = array_iconv($key, $output);
+                if (is_array($val)) {
+                    $data[$key] = array_iconv($val, $output);
+                } else {
+                    $data[$key] = mb_convert_encoding($data, $output, $encoded);
+                }
             }
+            return $data;
         }
-        return $data;
     }
 }
 
@@ -367,4 +315,24 @@ function list_sort_by($list, $field, $sortby = 'asc')
         return $resultSet;
     }
     return false;
+}
+
+if(!function_exists('config')){
+    function config($file): array
+    {
+        $configFile = ROOT_PATH . DIRECTORY_SEPARATOR .'config' .DIRECTORY_SEPARATOR .$file . '.php';
+        if (file_exists($configFile)){
+            try {
+                $config = include($configFile);
+                if ($config && is_array($config)){
+                    return $config;
+                }
+                return [];
+            }catch (\Exception $e){
+                return [];
+            }
+        }else{
+            return [];
+        }
+    }
 }
