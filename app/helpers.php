@@ -334,3 +334,37 @@ if (!function_exists('scan_dir')){
         return $files;
     }
 }
+
+
+/**
+ * [list_sort_by 二维数组排序函数]
+ * @param $list
+ * @param $field
+ * @param string $sortby [排序方式]
+ * @return array|false [type]         [description]
+ */
+function list_sort_by($list, $field, $sortby = 'asc')
+{
+    if (is_array($list)) {
+        $refer = $resultSet = array();
+        foreach ($list as $i => $data) {
+            $refer[$i] = &$data[$field];
+        }
+        switch ($sortby) {
+            case 'asc':			 	// 正向排序
+                asort($refer);
+                break;
+            case 'desc': 			// 逆向排序
+                arsort($refer);
+                break;
+            case 'nat': 			// 自然排序
+                natcasesort($refer);
+                break;
+        }
+        foreach ($refer as $key => $val) {
+            $resultSet[] = &$list[$key];
+        }
+        return $resultSet;
+    }
+    return false;
+}
