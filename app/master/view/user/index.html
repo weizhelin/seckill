@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<{include file="tpl/head.tpl"}>
+	<{include file="tpl/style.tpl"}>
+	<style>
+		table thead th,table tbody tr td {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+<{include file="tpl/nav.tpl"}>
+<div class="container-fluid">
+	<table class="table table-striped">
+	  <caption><{$title}></caption>
+	  <thead>
+	  <tr>
+		<th class="hiddenonoff">ID</th>
+		<th>昵称</th>
+		<th class="hiddenonoff">用户名</th>
+		<th class="hiddenonoff">用户组</th>
+		<th class="hiddenonoff">署名</th>
+		<th>
+		 <select name="level_id" id="level_id" style="width:75px">
+              <option value="0">职级</option>
+              <{foreach from=$levels item=vo}>
+                  <option value="<{$vo.level_id}>" <{if $vo.level_id eq $level_id}>selected=selected <{/if}> ><{$vo.level_rand}><{$vo.level_name}></option>
+              <{/foreach}>
+          </select>
+		</th>
+		<th>
+		  <select name="web_id" id="web_id" style="width:60px">
+		      <option value="0">网站</option>
+		      <{foreach from=$webs item=w}>
+		          <option value="<{$w.web_id}>" <{if $w.web_id eq $web_id}>selected=selected <{/if}> ><{$w.web_name}></option>
+		      <{/foreach}>
+		  </select>
+		</th>
+		<th class="hiddenonoff">过往</th>
+		<{if $userinfo.role_id eq 1}>
+		<th class="hiddenonoff">操作</th>
+		<{elseif $userinfo.role_id eq 2}>   
+		<th class="hiddenonoff">操作</th>
+		<{/if}>
+	  </tr>
+	  </thead>
+	  <tbody>
+	  	  <{foreach from=$userlist item=vo}>
+			<tr id="<{$vo.user_id}>">
+		      <td class="hiddenonoff"><{$vo.user_id}></td>     
+		      <td><{$vo.nick}></td>
+		      <td class="hiddenonoff"><{$vo.username}></td>  
+		      <td class="hiddenonoff"><{$vo.role_name}></td>
+		      <td class="hiddenonoff"><{$vo.signature}></td>
+		      <td><{$vo.level_name}></td>
+		      <!--td><{$vo.indite_name}></td-->
+		      <td><{$vo.web_name}></td>  
+		      <td class="hiddenonoff"><{$vo.weblist}></td> 
+		      <{if $userinfo.role_id lt 3}> 
+		      <td class="hiddenonoff">      
+		        <div class="button-group">
+				<{if $userinfo.role_id eq 1 && $vo.forbidon eq 0}>	
+					<{if $vo.role_id eq 3}>
+					    <button class="btn btn-info up" data-id="<{$vo.user_id}>" style="padding:3px;">升管理员</button>	
+					<{elseif $vo.role_id eq 2}>             
+					 	<button class="btn btn-danger down" data-id="<{$vo.user_id}>" style="padding:3px;">降为编辑</button>
+					<{/if}>
+				<{/if}> 
+
+		          <{if $userinfo.role_id eq 1 && $vo.forbidon eq 0}> 
+		          <button class="btn btn-primary edit" data-id="<{$vo.user_id}>" style="padding:3px;">修改</button>
+		          <{/if}>
+		          <{if $vo.forbidon eq 1}>
+		          <button class="btn btn-success doactive" data-id="<{$vo.user_id}>" style="padding:3px;">启用</button>
+		          <{else}>
+		          <button class="btn btn-danger inactive" data-id="<{$vo.user_id}>" style="padding:3px;">禁用</button>
+		          <{/if}>           
+		           <{if $userinfo.role_id eq 1 && $vo.forbidon eq 0}> 
+		           <button class="btn btn-warning reset" data-id="<{$vo.user_id}>" style="padding:3px;">密码初始化</button>
+		           <{/if}>
+		        </div>
+		      </td>
+		      <{/if}>
+		    </tr>
+		   <{/foreach}>  
+	  </tbody>
+	</table>
+	<table class="table">
+      <tr style="width:100%">
+        <td style="width:100%">
+          <div class="pagelist" id="pagelist"> 
+            <{$pagelist}>
+          </div>
+        </td>
+      </tr>
+  </table>
+</div>
+<script>
+	$('#level_id').on('change',function(){
+        dofilter();
+    });
+    $('#indite_id').on('change',function(){
+        dofilter();
+    });
+    $('#web_id').on('change',function(){
+        dofilter();
+    });
+
+    function dofilter(){
+        level_id  = $('#level_id').val();
+        indite_id = $('#indite_id').val();
+        web_id  =  $('#web_id').val();
+        forbidon =  "<{$forbidon}>";
+        href = '/index.php?m=master&c=user';
+        if (level_id != 0) {
+        	href = href + '&level_id='+level_id;
+        }
+        if (indite_id != 0) {
+        	href = href +"&indite_id="+indite_id
+        };
+        if (web_id != 0) {
+        	href = href +"&web_id="+web_id
+        };
+        if (forbidon != 0) {
+        	href = href +"&forbidon="+forbidon;
+        };
+        
+        window.location.href  = href;
+    }
+
+	$('.up').click(function(){
+		id = $(this).attr('data-id');
+		msg = '确认将id为'+$(this).attr('data-id')+'的用户升为管理员';
+		if (confirm(msg)==true){
+			$.ajax({
+				type:'GET',
+				url:'/index.php?m=master&c=User&a=up&user_id='+id,
+				success:function(data){
+					if (data == 1) {
+						alert('成功将id为'+id+'的用户升为管理员')
+						window.location.reload();
+					}					
+				},
+				error:function(){
+					alert('error');
+				}
+			})
+		}else{
+			return false;
+		}
+	});
+
+	$('.down').click(function(){
+		id = $(this).attr('data-id');
+		msg = '确认将id为'+$(this).attr('data-id')+'的用户降为编辑';
+		if (confirm(msg)==true){
+			$.ajax({
+				type:'GET',
+				url:'/index.php?m=master&c=User&a=down&user_id='+id,
+				success:function(data){
+					if (data == 1) {
+						alert('成功将id为'+id+'的用户降为编辑')
+						window.location.reload();
+					}else{
+						alert(data)
+					}		
+				},
+				error:function(){
+					alert('error');
+				}
+			})
+		}else{
+			return false;
+		}
+	});
+
+	$('.edit').click(function(){
+		id = $(this).attr('data-id');
+		$.ajax({
+			type:'GET',
+			url:'/index.php?m=master&c=User&a=getUserInfo&user_id='+id,
+			success:function(data){
+				$('#'+id).html(data);
+				$('.cancle').click(function(){
+					window.location.reload()
+				})
+				$('.post').click('on',function(){
+
+                  level_id = $('#'+id).find('select').eq(0).val();
+                  if (level_id=='') {
+                    alert('请选择职级');
+                    return false;
+                  }
+
+                  web_id    = $('#'+id).find('select').eq(1).val();
+                  if (web_id=='') {
+                    alert('请选择网站');
+                    return false;
+                  };
+                  user_id   = $(this).attr('userid');
+
+                  signature = $('#'+id).find('td').eq(4).find('input').eq(0).val();
+
+                  //weblist 网站id列表
+                  weblist = $('#'+id).find('td').eq(7).find("input:checked");
+                  w =',';
+                  for (var i = 0; i <=  weblist.length - 1; i++) {
+                    w += $(weblist[i]).val() + ',';
+                  };
+
+                  $.ajax({
+                      type:"GET",
+                      url:"/index.php?m=master&c=User&a=postUserInfo&user_id="+user_id+"&level_id="+level_id+"&web_id="+web_id+"&weblist="+w+'&signature='+signature,
+                      success:function(info){ 
+                      	obj = $.parseJSON(info)
+                          if (obj.code == 200) {
+                          	alert(obj.message);
+                            window.location.reload();
+                          }else{
+                            alert(obj.message)
+                          }     
+                      },
+                      error:function(){
+                      }
+                  });
+              });
+			},
+			error:function(){
+				alert('error');
+			}
+		});
+	})
+
+	$('.doactive').click(function(){
+		id = $(this).attr('data-id');
+		msg = '确认启用id为'+$(this).attr('data-id')+'的用户';
+		if (confirm(msg)==true){
+			$.ajax({
+				type:'GET',
+				url:'/index.php?m=master&c=user&a=active&user_id='+id,
+				success:function(data){
+					if (data == 1) {
+						alert('成功禁用id为'+id+'的用户');
+						window.location.reload();
+					}else{
+						alert(data)
+					}		
+				},
+				error:function(){
+					alert('error');
+				}
+			});
+		}else{
+			return false;
+		}
+	});
+
+	$('.inactive').click(function(){
+		id = $(this).attr('data-id');
+		msg = '确认禁用id为'+$(this).attr('data-id')+'的用户';
+		if (confirm(msg)==true){
+			$.ajax({
+				type:'GET',
+				url:'/index.php?m=master&c=User&a=inactive&user_id='+id,
+				success:function(data){
+					if (data == 1) {
+						alert('成功禁用id为'+id+'的用户');
+						window.location.reload();
+					}else{
+						alert(data)
+					}		
+				},
+				error:function(){
+					alert('error');
+				}
+			})
+		}else{
+			return false;
+		}
+	});
+
+	$('.reset').click(function(){
+		id = $(this).attr('data-id');
+		msg = '确认将id为'+$(this).attr('data-id')+'的用户密码初始化';
+		if (confirm(msg)==true){
+			$.ajax({
+				type:'GET',
+				url:'/index.php?m=master&c=User&a=reset&user_id='+id,
+				success:function(data){
+					if (data == 1) {
+						alert('成功将id为'+id+'的用户密码初始化');
+						window.location.reload();
+					}else{
+						alert(data)
+					}		
+				},
+				error:function(){
+					alert('error');
+				}
+			})
+		}else{
+			return false;
+		}
+	});
+</script>
+<{include file="tpl/script.tpl"}>
+</body>
+</html>

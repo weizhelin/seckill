@@ -1,0 +1,19 @@
+{
+  "require": {
+    "noahbuscher/macaw": "dev-master",
+    "twig/twig": "^2.12",
+    "phpmailer/phpmailer": "^6.6",
+    "ext-iconv": "*",
+    "ext-openssl": "*",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "app"
+    },
+    "files": [
+      "app/helpers.php"
+    ]
+  }
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<{include file="tpl/head.tpl"}>
+	<{include file="tpl/style.tpl"}>
+</head>
+<body>
+<{include file="tpl/nav.tpl"}>
+<div class="container-fluid">
+	<table class="table table-striped">
+	  <caption><h2><{$title}></h2></caption>
+	  <thead>
+	    <tr>
+	      <th class="hiddenonoff">RECORDID</th>
+	      <th>
+	          <select name="user_id" id="user_id">
+	            <option value="0">编辑</option>
+	            <{foreach from=$userlist item=ul}>
+	                <option value="<{$ul.user_id}>" <{if $user_id eq $ul.user_id}>selected=selected<{/if}>><{$ul.nick}></option>
+	            <{/foreach}>
+	          </select>
+	      </th>
+	      <th class="hiddenonoff">
+	          <select name="web_id" id="web_id">
+	            <option value="0">网站</option>
+	            <{foreach from=$weblist item=wl}>
+	              <option value="<{$wl.web_id}>" <{if $web_id eq $wl.web_id}>selected=selected<{/if}>><{$wl.web_name}></option>
+	            <{/foreach}>
+	          </select>
+	      </th>
+	      <th class="hiddenonoff">
+	          <select name="month" id="month">
+	            <option value="0">错误日期</option>
+	            <{foreach from=$monthlist item=ml}>
+	              <option value="<{$ml}>" <{if $month eq $ml}>selected=selected<{/if}>><{$ml}></option>
+	            <{/foreach}>
+	          </select>
+	      </th>
+	      <th>文章ID</th>
+	      <th>错误</th>      
+	      <th class="hiddenonoff">分值</th>      
+	      <th>状态</th>
+	      <{if $userinfo.role_id eq 1}>
+	        <th class="hiddenonoff">操作</th>
+	      <{/if}>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  	<{foreach from=$errorlist item=el}>
+        <tr id="<{$el.record_id}>">
+          <td class="hiddenonoff"><{$el.record_id}></td>
+          <td><{$el.nick}></td>
+          <td class="hiddenonoff"><{$el.web_name}></td>
+          <td class="hiddenonoff"><{$el.day}></td>
+          <td><{$el.article_id}></td>          
+          <td><{$el.requirement}></td>
+          <td class="hiddenonoff"><{$el.score}></td>
+          <td style="align:center;">
+            <{if $el.sign eq 1}>
+              <{if $el.sign_type eq 'voluntary'}>
+                <span style="color:green">已签收</span>
+                <{else}>
+                <span style="color:green">系统代签</span>
+                <{/if}>
+            <{elseif $el.user_id eq $userinfo.user_id}>
+                <button class="btn btn-success sign" data-id="<{$el.record_id}>">签收</button>
+            <{else}>
+                <span style="color:red">未签收</span>
+            <{/if}>            
+          </td>
+          <{if $userinfo.role_id eq 1}>
+          <td class="hiddenonoff">
+            <div class="button-group"> 
+            	<{if $el.sign neq 1}>
+              	<button class="btn btn-danger del" data-id="<{$el.record_id}>">删除</button>
+              	<{/if}>
+            </div>
+          </td>
+          <{/if}>
+        </tr>
+    	<{/foreach}>
+    	<tr>
+        <td colspan="11" style="text-align:center">
+          <div class="pagelist" id="pagelist"> 
+            <{$pagelist}>
+          </div>
+        </td>
+      </tr>
+	  </tbody>
+	</table>
+</div>
+<script>
+	$('.sign').click('on',function(){
+      var msg = "确认签收"; 
+      if (confirm(msg)==true){ 
+          record_id = $(this).attr('data-id');
+          $.ajax({
+              type:'GET',
+              url:'/index.php?m=master&c=error&a=dosign&record_id='+record_id,
+              success:function(data){
+                if (data == 1) {
+                	window.location.reload();
+                }                
+              },
+              error:function(){
+              }
+          });
+      }else{
+        return false;
+      }      
+  });
+
+  $('.del').click('on',function(){
+    if (confirm('确认删除') == true) {
+      record_id = $(this).attr('data-id');
+      $.ajax({
+        type:"GET",
+        url:"/index.php?m=master&c=Error&a=del&record_id="+record_id,
+        success:function(data){
+          window.location.reload();
+        },
+        error:function(){
+
+        }
+      });
+    }else{
+        return false;
+    }
+  });
+
+	$('#user_id').on('change',function(){
+	  dofilter();
+	});
+	$('#indite_id').on('change',function(){
+	  dofilter();
+	});
+	$('#web_id').on('change',function(){
+	  dofilter();
+	});
+	$('#month').on('change',function(){
+	  dofilter();
+	});
+
+  function dofilter(){
+      user_id = $('#user_id').val();
+      web_id = $('#web_id').val();
+      month = $('#month').val();
+      indite_id = $('#indite_id').val();
+      window.location.href = '/index.php?m=master&c=error&user_id='+user_id+"&indite_id="+indite_id+"&web_id="+web_id+"&month="+month;
+  }
+</script>
+<{include file="tpl/script.tpl"}>
+</body>
+</html>

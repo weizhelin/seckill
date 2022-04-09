@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<{include file="tpl/head.tpl"}>
+	<{include file="tpl/style.tpl"}>
+</head>
+<body>
+<{include file="tpl/nav.tpl"}>
+<div class="container-fluid" >
+<table class="table">
+	<caption><h2><{$title}></h2></caption>
+	<tr>
+		<td>
+			<label><{$role_name}></label>
+		</td>
+		<td>
+			<label><{$userinfo.username}></label>
+        </td>
+    </tr>
+    <form method="post" class="form-x" id="myform" action="/index.php?m=master&c=User&a=dopass">
+	<tr>
+		<td>
+			<label>原始密码：</label>
+		</td>
+		<td>
+			<input type="password" placeholder="请输入原始密码" id="oldpwd" name="oldpwd" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>新密码：</label>
+		</td>
+		<td>
+			<input type="password"  placeholder="请输入新密码" id="newpwd" name="newpwd" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>确认新密码：</label>
+		</td>
+		<td>
+			<input type="password"  placeholder="请再次输入新密码" id="confirmpwd" name="confirmpwd" />
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<button class="btn btn-success" onclick="return validate()"> 提交</button>  
+		</td>
+	</tr>
+	</form>
+</table>
+<form method="post" class="form-x" action="/index.php?m=master&c=User&a=dopass">
+</form>
+</div>
+<script>
+	function validate(){
+		oldpwd = $('#oldpwd').val();
+		if ($('#oldpwd').val().length <3) {
+			alert('请正确输入原始密码');
+			$('#oldpwd').val('');
+			$('#oldpwd').focus();
+			return false;
+		}
+   		if ($('#newpwd').val().length < 6 || $('#newpwd').val().length > 20) {
+   			alert('请输入6到20位新密码');
+   			$('#newpwd').focus();
+   			return false;
+   		}
+   		if ($('#confirmpwd').val() != $('#newpwd').val()) {
+   			alert('输入的两个新密码不一致，请重新输入');
+   			$('#confirmpwd').val('');
+   			$('#confirmpwd').focus();
+   			return false;
+   		};
+   		$('#myform').submit()
+	}
+    
+
+
+</script>
+<{include file="tpl/script.tpl"}>
+</body>
+</html>
