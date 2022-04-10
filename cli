@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+
+//https://zhuanlan.zhihu.com/p/367892971
+//php cli模式
+
+
+var_dump($argc);
+var_dump($argv);
+
+var_dump($_SERVER['argv']);
+var_dump($_SERVER['argc']);
+
+$name = '';
+$age  = '';
+while(true){
+    fwrite(STDOUT,"Enter your name:");  //标准输出，等待用户输入用户名
+    $name = trim(fgets(STDIN));         //标准输入，立即获取用户名
+    if(!empty($name)){
+        echo $name;
+        break 1;
+    }
+}
+
+
+
