@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c5315b74327bff84d89e7c4a2358dd7",
+    "content-hash": "87295f6ea64e765255b60b937a2e20cd",
     "packages": [
         {
             "name": "noahbuscher/macaw",

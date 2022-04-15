@@ -1,7 +1,7 @@
 .idea
+config
+rsa
+runtime
+vendor
 composer_bak
 plan.txt
-vendor
-rsa
-config
-runtime
