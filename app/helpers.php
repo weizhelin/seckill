@@ -336,3 +336,19 @@ if(!function_exists('config')){
         }
     }
 }
+
+//获取当前URL方法：
+function getCurrentUrl(): string
+{
+    $url = 'http://';
+    if (isset($_SERVER['SERVER_HTTPS']) &&  $_SERVER['SERVER_HTTPS'] == 'on'){
+        $url = 'https://';
+    }
+    //判断端口
+    if($_SERVER['SERVER_PORT'] != 80){
+        $url .=$_SERVER['SERVER_name'].':'.$_SERVER['SERVER_PORT'];
+    } else{
+        $url .=$_SERVER['SERVER_name'];
+    }
+    return $url;
+}

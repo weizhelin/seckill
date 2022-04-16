@@ -1,5 +1,6 @@
 <?php
-define("ROOT_PATH",dirname(__DIR__) );
+
+define("ROOT_PATH",dirname(__DIR__) .DIRECTORY_SEPARATOR);
 require '../vendor/autoload.php';
 require '../config/routes.php';
 
