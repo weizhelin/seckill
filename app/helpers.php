@@ -352,3 +352,101 @@ function getCurrentUrl(): string
     }
     return $url;
 }
+
+function is_id_card($id): bool
+{
+    $id = strtoupper($id);
+
+    //判断身份证号格式
+    $pattern = '/^[\d]{17}[\dxX]$/';
+    if (!preg_match($pattern,$id)){
+        return false;
+    }
+
+    $provinceCodes = array(
+        11,12,13,14,15,
+        21,22,23,
+        31,32,33,34,35,36,37,
+        41,42,43,44,45,46,
+        50,51,52,53,54,
+        61,62,63,64,65,
+        81,82,83
+    );
+
+    //判断首两位是否在省份代码中
+    $first2 = substr($id,0,2);
+    if (!in_array($first2,$provinceCodes)){
+        return false;
+    }
+
+    //将前面的身份证号码17位数分别乘以不同的系数，将这17位数字和系数相乘的结果相加。
+    $coefficients = array(
+        7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2
+    );
+
+    //拆分成数组
+    $codes = array();
+    $len = mb_strlen($id, "UTF-8");
+    for ($i = 0; $i < $len; $i +=1) {
+        $codes[] = mb_substr($id, $i, 1, "UTF-8");
+    }
+
+    //求和
+    $sum = 0;
+    for ($j = 0;$j<17;$j++ ){
+        $sum += $coefficients[$j] * $codes[$j];
+    }
+
+    //求余数
+    $remainder = $sum % 11;
+
+    //余数对应的校验码
+    $checkCodes = array(
+        1,0,'X',9,8,7,6,5,4,3,2
+    );
+
+    if ($checkCodes[$remainder] != $codes[17]){
+        return false;
+    }
+
+    return true;
+}
+
+
+
+if(!function_exists('curlPostJ')){
+    function curlPostJ($url,$params = array(),$type = 'default',$header = array(),$timeOut = 10){
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeOut);
+
+        if($type == 'json'){
+            $header = array_merge(array('Content-type:application/json;charset=UTF-8'),$header);
+            $params = json_encode($params,JSON_UNESCAPED_UNICODE);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        }else{
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            $params = http_build_query($params);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        }
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+
+        $data = curl_exec($ch);
+
+        if (curl_errno($ch)) {//出错则显示错误信息
+            if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 0) {
+                return '发送超时';
+            }
+            if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 100) {
+                return '错误响应100';
+            }
+            return print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE), true).'错误信息：'.print_r(curl_error($ch), true);
+        }
+        curl_close($ch);
+        return $data;
+    }
+}

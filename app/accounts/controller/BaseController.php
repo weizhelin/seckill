@@ -1,7 +1,8 @@
 <?php
 
 
-namespace app\note\controller;
+namespace app\accounts\controller;
+
 
 class BaseController
 {

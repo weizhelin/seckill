@@ -24,7 +24,7 @@ class MqJsonController extends BaseController
      * @param array $arr
      * @return array
      */
-    protected function parseOrderInfo($arr)
+    protected function parseOrderInfo($arr): array
     {
         $order = $arr['result']['data'];
         $subs = [];
@@ -38,7 +38,7 @@ class MqJsonController extends BaseController
     }
 
 
-    protected function isJson($data = '', $assoc = false)
+    protected function isJson($data = '', $assoc = false): bool
     {
         $data = json_decode($data, $assoc);
         if (($data && (is_object($data))) || (is_array($data) && !empty($data))) {
@@ -52,7 +52,7 @@ class MqJsonController extends BaseController
      * @param string $json
      * @return array
      */
-    protected function parseJson($json)
+    protected function parseJson($json): array
     {
         if (empty($json)) {
             return [];
