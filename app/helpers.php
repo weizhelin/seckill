@@ -288,17 +288,17 @@ if (!function_exists('scan_dir')){
  * [list_sort_by 二维数组排序函数]
  * @param $list
  * @param $field
- * @param string $sortby [排序方式]
+ * @param string $sortBy [排序方式]
  * @return array|false [type]         [description]
  */
-function list_sort_by($list, $field, $sortby = 'asc')
+function list_sort_by($list, $field, $sortBy = 'asc')
 {
     if (is_array($list)) {
         $refer = $resultSet = array();
         foreach ($list as $i => $data) {
             $refer[$i] = &$data[$field];
         }
-        switch ($sortby) {
+        switch ($sortBy) {
             case 'asc':			 	// 正向排序
                 asort($refer);
                 break;
@@ -448,5 +448,20 @@ if(!function_exists('curlPostJ')){
         }
         curl_close($ch);
         return $data;
+    }
+}
+
+
+if (!function_exists('env')) {
+    /**
+     * 获取环境变量值
+     * @access public
+     * @param string $name    环境变量名（支持二级 .号分割）
+     * @param string $default 默认值
+     * @return mixed
+     */
+    function env(string $name = null, $default = null)
+    {
+        return Env::get($name, $default);
     }
 }

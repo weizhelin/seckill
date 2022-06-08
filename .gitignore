@@ -3,5 +3,4 @@ config
 rsa
 runtime
 vendor
-composer_bak
 plan.txt
